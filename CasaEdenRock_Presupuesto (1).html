@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presupuesto — Casa Eden Rock</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#F4F6F9;color:#1a1a1a;font-size:13px}
+header{background:#1F3864;color:white;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+header h1{font-size:16px;font-weight:600}
+header .sub{font-size:11px;opacity:0.75;margin-top:3px}
+.badge{background:#2E75B6;color:white;font-size:11px;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.laudo-badge{background:#3B6D11;color:white;font-size:10px;padding:2px 8px;border-radius:20px;margin-left:6px}
+.layout{display:grid;grid-template-columns:270px 1fr;min-height:calc(100vh - 56px)}
+.sidebar{background:#fff;border-right:1px solid #e0e4ea;padding:14px;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto}
+.sidebar h3{font-size:10px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px}
+.cap-link{display:block;padding:6px 10px;border-radius:6px;color:#333;text-decoration:none;font-size:12px;margin-bottom:2px;cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:background 0.15s}
+.cap-link:hover{background:#EBF3FB;color:#185FA5}
+.cap-link.active{background:#1F3864;color:white;font-weight:500}
+.cap-link .cap-usd{float:right;font-size:11px;opacity:0.7}
+.sidebar-totals{margin-top:14px;padding-top:12px;border-top:1px solid #e0e4ea}
+.st-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;color:#444}
+.st-row.bold{font-weight:600;color:#1F3864}
+.st-row.final{background:#1F3864;color:white;padding:7px 10px;border-radius:6px;margin-top:6px;font-weight:600;font-size:13px}
+.laudos-box{background:#EAF3DE;border:1px solid #3B6D11;border-radius:6px;padding:8px 10px;margin-top:12px;font-size:11px;color:#27500A}
+.laudos-box strong{display:block;color:#3B6D11;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+.laudos-box table{width:100%;font-size:11px}
+.laudos-box td{padding:1px 0;color:#333}
+.laudos-box td:last-child{text-align:right;font-weight:500;color:#27500A}
+.main{padding:20px 24px;overflow-y:auto}
+.controls{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.controls input,.controls select{padding:6px 10px;border:1px solid #d0d5de;border-radius:6px;font-size:12px;background:#fff;color:#1a1a1a;outline:none}
+.controls input:focus,.controls select:focus{border-color:#2E75B6;box-shadow:0 0 0 2px rgba(46,117,182,0.15)}
+.btn{padding:6px 12px;border-radius:6px;border:1px solid #d0d5de;background:#fff;font-size:12px;cursor:pointer;color:#333;transition:all 0.15s}
+.btn:hover{background:#EBF3FB;border-color:#2E75B6;color:#185FA5}
+.btn.primary{background:#1F3864;color:white;border-color:#1F3864}
+.btn.primary:hover{background:#2E75B6;border-color:#2E75B6}
+.section{margin-bottom:24px;scroll-margin-top:72px}
+.cap-header{background:#1F3864;color:white;padding:9px 14px;border-radius:8px 8px 0 0;display:flex;justify-content:space-between;align-items:center}
+.cap-header h2{font-size:13px;font-weight:600}
+.cap-header .cap-total{font-size:12px;opacity:0.85;text-align:right}
+.cap-header .cap-total span{font-size:11px;opacity:0.7;display:block}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:0 0 8px 8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+thead th{background:#EBF3FB;color:#185FA5;font-size:11px;font-weight:600;padding:7px 8px;text-align:right;white-space:nowrap;border-bottom:1px solid #D6E4F0}
+thead th:first-child{text-align:left}
+tbody tr:nth-child(even){background:#FAFBFC}
+tbody tr:hover{background:#EBF3FB}
+tbody td{padding:6px 8px;border-bottom:0.5px solid #eef0f3;vertical-align:middle;text-align:right;color:#222}
+tbody td:first-child{text-align:left}
+.desc-main{font-size:12px;font-weight:500;color:#1a1a1a}
+.desc-note{font-size:11px;color:#888;margin-top:1px}
+.editable{border:none;background:transparent;font-size:12px;text-align:right;width:100%;font-family:inherit;color:#1a1a1a;padding:2px 4px;border-radius:4px;cursor:text}
+.editable:focus{outline:2px solid #2E75B6;background:#fff}
+.editable.changed{background:#FFF3CD;border-radius:3px}
+.mo-cell{color:#666;font-size:12px}
+.subtotal-row td{background:#D6E4F0;font-weight:600;font-size:12px;color:#1F3864;border-top:1.5px solid #2E75B6}
+.mat-mo-row td{background:#F4F6F9;font-size:11px;color:#555}
+.resumen-card{background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,0.08);overflow:hidden;margin-bottom:24px}
+.resumen-card-header{background:#1F3864;color:white;padding:12px 18px;font-size:14px;font-weight:600}
+.resumen-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.metric{padding:14px 16px;border-right:1px solid #e0e4ea;border-bottom:1px solid #e0e4ea}
+.metric:nth-child(4n){border-right:none}
+.metric-label{font-size:11px;color:#888;margin-bottom:5px;font-weight:500}
+.metric-uyu{font-size:15px;font-weight:600;color:#1F3864}
+.metric-usd{font-size:12px;color:#2E75B6;margin-top:2px}
+.resumen-rows{padding:0 18px 4px}
+.r-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:0.5px solid #eef0f3;font-size:13px}
+.r-row:last-child{border-bottom:none}
+.r-row.section-row{font-weight:600;color:#1F3864;padding-top:12px}
+.r-row.indent{padding-left:16px;font-size:12px;color:#555}
+.r-row.highlight{background:#EBF3FB;margin:0 -18px;padding:9px 18px;font-weight:600}
+.r-row.final-row{background:#1F3864;color:white;margin:8px -18px -4px;padding:13px 18px;font-weight:700;font-size:15px;border-radius:0 0 10px 10px}
+.r-right{text-align:right}
+.r-right .uyu{font-weight:500}
+.r-right .usd{font-size:11px;color:#2E75B6;margin-top:2px}
+.r-row.final-row .r-right .usd{color:rgba(255,255,255,0.7)}
+.nota-bar{background:#FCE4D6;border:1px solid #CC4400;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:11px;color:#5a2a0a;line-height:1.6}
+.nota-bar strong{color:#CC4400}
+.laudo-info{background:#EAF3DE;border:1px solid #3B6D11;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:11px;color:#27500A;line-height:1.7}
+.laudo-info strong{color:#3B6D11}
+@media print{
+  .controls,.sidebar,.btn{display:none}
+  .layout{display:block}
+  .main{padding:0}
+  header{position:relative;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  .cap-header,.resumen-card-header,.r-row.final-row{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  .section{page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Casa Eden Rock — Presupuesto de Construcción</h1>
+    <div class="sub">Smart Building Uruguay &nbsp;|&nbsp; Steel framing + acero tubular &nbsp;|&nbsp; Maldonado &nbsp;|&nbsp; 187,90 m² &nbsp;|&nbsp; TC $41,50 UYU/USD</div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <span class="badge" id="badge-total">Calculando...</span>
+    <span class="laudo-badge">Laudos mayo 2026</span>
+    <button class="btn primary" onclick="window.print()">🖨 Imprimir / PDF</button>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="sidebar">
+  <h3>Capítulos</h3>
+  <div id="nav-caps"></div>
+  <div class="sidebar-totals" id="sidebar-totals"></div>
+  <div class="laudos-box">
+    <strong>Laudos Grupo 9 Sub01 — mayo 2026</strong>
+    <table>
+      <tr><td>Cat I — Peón</td><td>$1.894,57/día</td></tr>
+      <tr><td>Cat V — Medio oficial</td><td>$2.520,37/día</td></tr>
+      <tr><td>Cat VII — Oficial</td><td>$2.938,33/día</td></tr>
+      <tr><td>Cat VIII — Capataz</td><td>$3.371,14/día</td></tr>
+      <tr><td>Ropa por jornal</td><td>$103,44</td></tr>
+      <tr><td>CS (BPS+Caja)</td><td>75,8%</td></tr>
+    </table>
+  </div>
+</nav>
+
+<main class="main">
+
+  <div class="laudo-info">
+    <strong>✓ Laudos actualizados — Grupo 9 Subgrupo 01, mayo 2026</strong>
+    Oficial Cat VII: $2.938,33/día &nbsp;|&nbsp; Ayudante Cat I: $1.894,57/día &nbsp;|&nbsp; Capataz Cat VIII: $3.371,14/día &nbsp;|&nbsp; Ropa: $103,44/jornal &nbsp;|&nbsp; CS: 75,8% &nbsp;|&nbsp;
+    Costo real empresa c/CS: Oficial $5.470/día · Ayudante $3.513/día · Capataz $6.108/día
+  </div>
+
+  <div class="nota-bar">
+    <strong>Notas:</strong>
+    Siding pino machimbrado (Op.A, activo) / lapacho (Op.B, cant=0 — cambiar para activar) &nbsp;·&nbsp;
+    Tyvek = barrera hidrófuga exterior (bajo revestimiento) &nbsp;|&nbsp; Film PE = barrera vapor interior (entre estructura y drywall) — son distintos &nbsp;·&nbsp;
+    No incluye honorarios técnicos, permisos municipales, conexiones OSE/UTE &nbsp;·&nbsp;
+    <strong>Cantidades y precios editables directamente en la tabla.</strong>
+  </div>
+
+  <div class="controls">
+    <select id="filter-cap"><option value="">Todos los capítulos</option></select>
+    <input type="text" id="search" placeholder="🔍 Buscar rubro..." style="min-width:180px">
+    <label style="font-size:12px;display:flex;align-items:center;gap:5px"><input type="checkbox" id="show-usd" checked> Ver USD</label>
+    <button class="btn" onclick="resetAll()">↺ Resetear</button>
+  </div>
+
+  <div id="resumen-top"></div>
+  <div id="rubros-container"></div>
+  <div id="resumen-bottom"></div>
+
+</main>
+</div>
+
+<script>
+const TC=41.50, CS=0.758, ROPA=103.44;
+// Laudos reales mayo 2026 - Grupo 9 Sub01
+const JOF=2938.33;   // Cat VII Oficial práctico
+const JAY=1894.57;   // Cat I   Peón común
+const JCAP=3371.14;  // Cat VIII Capataz/especializado
+const AREA=187.90, HUELLA=257.0, SUP_CUB=317.0, ML_CUB=87.0;
+const ML_EXT_B=75.53, ML_EXT_n=66.33, ML_INT_B=47.45, ML_INT_n=38.65;
+const SUP_EXT=380.0, SUP_INT=230.0;
+
+// MO incluye ropa por jornal
+function moU(jof,jay,jcap){
+  const jornales = jof*JOF + jay*JAY + jcap*JCAP;
+  const ropa = (jof+jay+jcap)*ROPA;
+  return (jornales+ropa)*(1+CS);
+}
+function usd(u){return u/TC}
+function fN(v){return Math.round(v).toLocaleString("es-UY")}
+function fUYU(v){return"$ "+fN(v)}
+function fUSD(v){return"USD "+Math.round(usd(v)).toLocaleString("es-UY")}
+function fRatio(v){return"USD "+Math.round(v).toLocaleString("es-UY")+"/m²"}
+
+const originalData=[
+  {cap:"1. Trabajos preliminares",id:"cap1",rubros:[
+    {d:"Limpieza y nivelación terreno",u:"m²",c:HUELLA,mu:80,jof:0.08,jay:0.05,jcap:0,n:"Topadora + manual"},
+    {d:"Replanteo y marcación obra",u:"gl",c:1,mu:2500,jof:4,jay:2,jcap:0.5,n:"Incluye instrumental"},
+    {d:"Instalación obrador / sanitarios",u:"gl",c:1,mu:18000,jof:3,jay:1.5,jcap:0,n:"Caseta/container"},
+  ]},
+  {cap:"2. Fundaciones / platea",id:"cap2",rubros:[
+    {d:"Excavación mecánica retro",u:"m³",c:Math.round(AREA*0.30*10)/10,mu:280,jof:0.05,jay:0.03,jcap:0,n:"Prof. 0,30m"},
+    {d:"Relleno y compactación sub-platea",u:"m³",c:Math.round(AREA*0.15*10)/10,mu:1100,jof:0.08,jay:0.05,jcap:0,n:"Tosca/ripio"},
+    {d:"Film polietileno 200 mic.",u:"m²",c:Math.round(AREA*1.10),mu:95,jof:0.015,jay:0.01,jcap:0,n:"Barrera vapor — sobre sub-base"},
+    {d:"Hormigón platea H-21 e=20cm",u:"m³",c:Math.round(AREA*0.20*100)/100,mu:7800,jof:0.25,jay:0.15,jcap:0.05,n:"37,58 m³ — bombeado"},
+    {d:"Hormigón vigas perimetrales",u:"m³",c:Math.round(ML_EXT_B*0.12*100)/100,mu:7800,jof:0.30,jay:0.20,jcap:0.05,n:"9,06 m³ — sección 30×40cm"},
+    {d:"Acero malla platea φ8 c/20",u:"kg",c:Math.round(AREA*6.17),mu:130,jof:0.008,jay:0.005,jcap:0,n:"Malla 188"},
+    {d:"Encofrado lateral platea",u:"m²",c:Math.round(ML_EXT_B*0.20*2*10)/10,mu:520,jof:0.15,jay:0.10,jcap:0,n:""},
+  ]},
+  {cap:"3. Estructura steel framing + acero tubular",id:"cap3",rubros:[
+    {d:"Perfil montante 89mm muro ext.",u:"ml",c:Math.round(ML_EXT_n*2.5*10)/10,mu:480,jof:0.05,jay:0.03,jcap:0,n:"G550 galvanizado"},
+    {d:"Perfil solera 89mm muro ext.",u:"ml",c:Math.round(ML_EXT_n*2*10)/10,mu:440,jof:0.025,jay:0.015,jcap:0,n:"Inferior + superior"},
+    {d:"Perfil montante 65mm tabiques",u:"ml",c:Math.round(ML_INT_n*2.5*10)/10,mu:420,jof:0.04,jay:0.025,jcap:0,n:""},
+    {d:"Perfil solera 65mm tabiques",u:"ml",c:Math.round(ML_INT_n*2*10)/10,mu:380,jof:0.02,jay:0.012,jcap:0,n:""},
+    {d:"Cabriadas steel techo barn",u:"m²",c:AREA,mu:3200,jof:0.18,jay:0.10,jcap:0.04,n:"Precio por m² planta"},
+    {d:"Acero tubular estructura central",u:"kg",c:2200,mu:175,jof:0.10,jay:0.06,jcap:0.02,n:"Tubo 100×100 + 80×80"},
+    {d:"Tornillería autoperforante",u:"gl",c:1,mu:38000,jof:0.5,jay:0.3,jcap:0,n:""},
+    {d:"Anclajes químicos platea↔estr.",u:"un",c:160,mu:340,jof:0.05,jay:0.03,jcap:0,n:"Hilti / Fischer"},
+  ]},
+  {cap:"4. Cerramiento exterior",id:"cap4",rubros:[
+    {d:"OSB 11mm sheathing exterior",u:"m²",c:SUP_EXT,mu:780,jof:0.06,jay:0.04,jcap:0,n:"Bajo revestimiento"},
+    {d:"Barrera hidrófuga exterior (Tyvek)",u:"m²",c:Math.round(SUP_EXT*1.10),mu:260,jof:0.03,jay:0.02,jcap:0,n:"Entre OSB y siding — distinto a film interior"},
+    {d:"Siding pino machimbrado (Op.A)",u:"m²",c:SUP_EXT,mu:1650,jof:0.12,jay:0.08,jcap:0,n:"Tratado CCA — ACTIVO"},
+    {d:"Siding lapacho (Op.B — alternativa)",u:"m²",c:0,mu:2900,jof:0.12,jay:0.08,jcap:0,n:"Mayor durabilidad — poner cant=380 para activar"},
+    {d:"Tratamiento / sellador madera ext.",u:"m²",c:SUP_EXT,mu:165,jof:0.05,jay:0.03,jcap:0,n:"2 manos lasur"},
+    {d:"Buñas y esquineros de remate",u:"ml",c:Math.round(ML_EXT_B*2),mu:380,jof:0.04,jay:0.025,jcap:0,n:"Perfil J / esquinero"},
+  ]},
+  {cap:"5. Aislación térmica",id:"cap5",rubros:[
+    {d:"Lana de vidrio 75mm muros ext.",u:"m²",c:SUP_EXT,mu:440,jof:0.03,jay:0.02,jcap:0,n:"R=2.0 m²K/W"},
+    {d:"Lana de vidrio 100mm bajo cubierta",u:"m²",c:HUELLA,mu:520,jof:0.035,jay:0.02,jcap:0,n:""},
+    {d:"Lana de vidrio 50mm tabiques",u:"m²",c:Math.round(SUP_INT*0.50),mu:340,jof:0.02,jay:0.015,jcap:0,n:"Baños + dorms"},
+    {d:"Barrera vapor interior (film PE)",u:"m²",c:Math.round((SUP_EXT+HUELLA)*1.05),mu:85,jof:0.015,jay:0.01,jcap:0,n:"Entre estructura y drywall — distinto al Tyvek exterior"},
+  ]},
+  {cap:"6. Cubierta chapa acanalada",id:"cap6",rubros:[
+    {d:"Chapa acanalada galv. N°25",u:"m²",c:Math.round(SUP_CUB*1.10),mu:1050,jof:0.07,jay:0.05,jcap:0.01,n:"+10% cortes y solape"},
+    {d:"Tornillos autoperf. techo",u:"un",c:Math.round(SUP_CUB*8),mu:25,jof:0,jay:0,jcap:0,n:"8 tornillos/m²"},
+    {d:"Burletes EPDM ondas",u:"ml",c:ML_CUB,mu:80,jof:0.015,jay:0.01,jcap:0,n:""},
+    {d:"Canaleta zinc/Al. c/soporte",u:"ml",c:ML_CUB,mu:920,jof:0.07,jay:0.05,jcap:0,n:""},
+    {d:"Bajadas pluviales Ø100mm",u:"ml",c:24,mu:580,jof:0.06,jay:0.04,jcap:0,n:"4 bajadas × 6ml"},
+    {d:"Cumbrera ventilada",u:"ml",c:19.80,mu:1100,jof:0.07,jay:0.05,jcap:0,n:""},
+    {d:"Limatesas ×4 uniones módulos",u:"ml",c:28,mu:780,jof:0.06,jay:0.04,jcap:0,n:"Chapa doblada"},
+    {d:"Cierre hastiales N/S (pared vert.)",u:"m²",c:Math.round(8.80*1.75/2*2*10)/10,mu:850,jof:0.08,jay:0.06,jcap:0,n:"Triángulo vertical"},
+  ]},
+  {cap:"7. Cerramiento interior — drywall",id:"cap7",rubros:[
+    {d:"Placa yeso 12,5mm (2 caras tabique)",u:"m²",c:Math.round(SUP_INT*2),mu:440,jof:0.07,jay:0.055,jcap:0,n:""},
+    {d:"Placa yeso RH baños",u:"m²",c:55,mu:580,jof:0.07,jay:0.055,jcap:0,n:"Resistente humedad"},
+    {d:"Placa yeso cielorraso",u:"m²",c:AREA,mu:440,jof:0.09,jay:0.07,jcap:0.01,n:"Suspendido"},
+    {d:"Masilla + cinta + terminación",u:"m²",c:Math.round(SUP_INT*2+AREA),mu:160,jof:0.09,jay:0.07,jcap:0,n:"Listo para pintar"},
+    {d:"Perfilería omega/canal cielorraso",u:"m²",c:AREA,mu:200,jof:0.03,jay:0.02,jcap:0,n:""},
+  ]},
+  {cap:"8. Pisos y revestimientos",id:"cap8",rubros:[
+    {d:"Contrapiso H-8 e=5cm",u:"m²",c:AREA,mu:620,jof:0.08,jay:0.06,jcap:0,n:"Sobre platea"},
+    {d:"Porcelanato 60×60 baños+cocina",u:"m²",c:55,mu:2100,jof:0.12,jay:0.10,jcap:0,n:"Inc. adhesivo + junta"},
+    {d:"Piso flotante madera click",u:"m²",c:Math.round(AREA-55),mu:3500,jof:0.07,jay:0.05,jcap:0,n:"Living + dormitorios"},
+    {d:"Zócalos madera pintada",u:"ml",c:Math.round(ML_INT_n+ML_EXT_n),mu:420,jof:0.03,jay:0.02,jcap:0,n:""},
+  ]},
+  {cap:"9. Aberturas",id:"cap9",rubros:[
+    {d:"Puerta acceso doble Al./PVC",u:"un",c:1,mu:58000,jof:0.6,jay:0.3,jcap:0,n:"1.80×2.10m"},
+    {d:"Puerta interior madera c/marco",u:"un",c:8,mu:16500,jof:0.3,jay:0.15,jcap:0,n:"0.80×2.10m"},
+    {d:"Puerta exterior parrillero",u:"un",c:1,mu:20000,jof:0.3,jay:0.15,jcap:0,n:"0.90×2.10m"},
+    {d:"Ventana dorm. corredera Al.",u:"un",c:2,mu:26000,jof:0.3,jay:0.15,jcap:0,n:"1.20×1.10m"},
+    {d:"Ventana living amplia Al.",u:"un",c:1,mu:44000,jof:0.4,jay:0.2,jcap:0,n:"2.40×1.20m"},
+    {d:"Ventana cocina-comedor Al.",u:"un",c:1,mu:39000,jof:0.4,jay:0.2,jcap:0,n:"2.40×1.20m"},
+    {d:"Ventana SSHH translúcida",u:"un",c:3,mu:8800,jof:0.16,jay:0.08,jcap:0,n:"0.60×0.60m"},
+    {d:"Ventana hall corredera Al.",u:"un",c:2,mu:20000,jof:0.3,jay:0.15,jcap:0,n:"0.90×1.10m"},
+    {d:"Vidriería fija parrillero",u:"m²",c:4.2,mu:11000,jof:0.16,jay:0.08,jcap:0,n:"Vidrio 6mm templado"},
+  ]},
+  {cap:"10. Instalación sanitaria",id:"cap10",rubros:[
+    {d:"Cañería agua fría PVC Ø20-25mm",u:"ml",c:85,mu:360,jof:0.07,jay:0.05,jcap:0,n:""},
+    {d:"Cañería agua caliente PPR Ø20mm",u:"ml",c:60,mu:490,jof:0.07,jay:0.05,jcap:0,n:""},
+    {d:"Cañería desagüe PVC Ø50-110mm",u:"ml",c:70,mu:390,jof:0.09,jay:0.06,jcap:0,n:""},
+    {d:"Artefactos sanitarios 4 baños",u:"gl",c:1,mu:340000,jof:1.2,jay:0.6,jcap:0.1,n:"WC + bidet + ducha + lavabo c/u"},
+    {d:"Grifería 4 juegos",u:"gl",c:1,mu:160000,jof:0.6,jay:0.3,jcap:0,n:""},
+    {d:"Tanque agua 750lts + soporte",u:"un",c:1,mu:44000,jof:0.6,jay:0.3,jcap:0,n:""},
+    {d:"Fosa séptica + pozo absorbente",u:"gl",c:1,mu:135000,jof:2.4,jay:1.2,jcap:0.2,n:"Pref. hormigón"},
+  ]},
+  {cap:"11. Instalación eléctrica",id:"cap11",rubros:[
+    {d:"Tablero principal c/diferenciales",u:"gl",c:1,mu:62000,jof:1.2,jay:0.6,jcap:0.1,n:"1 circuito por zona"},
+    {d:"Cañería conduit Ø20mm",u:"ml",c:380,mu:165,jof:0.06,jay:0.03,jcap:0,n:"En steel frame"},
+    {d:"Cableado NYA 1.5+2.5mm²",u:"ml",c:720,mu:110,jof:0.03,jay:0.015,jcap:0,n:""},
+    {d:"Bocas iluminación c/LED embutido",u:"un",c:38,mu:1650,jof:0.12,jay:0.06,jcap:0,n:""},
+    {d:"Tomas dobles polarizadas",u:"un",c:35,mu:1100,jof:0.08,jay:0.04,jcap:0,n:""},
+    {d:"Tomas especiales 20A",u:"un",c:6,mu:2000,jof:0.08,jay:0.04,jcap:0,n:"Cocina / lavadero"},
+    {d:"Puesta a tierra (jabalina+anillo)",u:"gl",c:1,mu:11000,jof:0.6,jay:0.3,jcap:0,n:""},
+    {d:"Preinst. TV / datos / CCTV",u:"gl",c:1,mu:16000,jof:0.8,jay:0.4,jcap:0,n:"Conduit + cajas"},
+  ]},
+  {cap:"12. Pintura",id:"cap12",rubros:[
+    {d:"Pintura interior látex 2 manos",u:"m²",c:Math.round(SUP_INT*2+AREA),mu:165,jof:0.06,jay:0.044,jcap:0,n:""},
+    {d:"Tratamiento exterior madera (lasur)",u:"m²",c:SUP_EXT,mu:200,jof:0.07,jay:0.05,jcap:0,n:""},
+    {d:"Pintura cielorraso 2 manos",u:"m²",c:AREA,mu:145,jof:0.05,jay:0.036,jcap:0,n:"Látex blanco"},
+  ]},
+  {cap:"13. Obras exteriores",id:"cap13",rubros:[
+    {d:"Movimiento de tierra final",u:"gl",c:1,mu:16000,jof:1.2,jay:0.6,jcap:0,n:"Nivelación jardín"},
+    {d:"Limpieza final de obra",u:"gl",c:1,mu:7000,jof:1.2,jay:0.6,jcap:0,n:"Retiro escombros"},
+  ]},
+];
+
+const data=JSON.parse(JSON.stringify(originalData));
+
+function calcRow(r){
+  const mo_u=moU(r.jof||0,r.jay||0,r.jcap||0);
+  const mat_tot=(r.mu||0)*r.c;
+  const mo_tot=mo_u*r.c;
+  return{mo_u,mat_tot,mo_tot,tot:mat_tot+mo_tot};
+}
+function calcTotals(){
+  let mat=0,mo=0;
+  data.forEach(cap=>cap.rubros.forEach(r=>{const c=calcRow(r);mat+=c.mat_tot;mo+=c.mo_tot;}));
+  const neto=mat+mo,imp=neto*0.10,ci=neto+imp,ben=ci*0.25,fin=ci+ben;
+  return{mat,mo,neto,imp,ci,ben,fin,ratio:usd(fin)/AREA};
+}
+
+function renderNav(){
+  const nav=document.getElementById("nav-caps");
+  nav.innerHTML="";
+  data.forEach(cap=>{
+    let capTot=0;
+    cap.rubros.forEach(r=>{capTot+=calcRow(r).tot;});
+    const btn=document.createElement("button");
+    btn.className="cap-link";
+    btn.innerHTML=`${cap.cap}<span class="cap-usd">${fUSD(capTot)}</span>`;
+    btn.onclick=()=>{
+      document.getElementById(cap.id).scrollIntoView({behavior:"smooth"});
+      document.querySelectorAll(".cap-link").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+    };
+    nav.appendChild(btn);
+  });
+  const t=calcTotals();
+  document.getElementById("sidebar-totals").innerHTML=`
+    <div class="st-row"><span>Materiales</span><span>${fUSD(t.mat)}</span></div>
+    <div class="st-row"><span>Mano de obra (c/CS)</span><span>${fUSD(t.mo)}</span></div>
+    <div class="st-row bold" style="border-top:1px solid #eee;margin-top:4px;padding-top:6px"><span>Subtotal neto</span><span>${fUSD(t.neto)}</span></div>
+    <div class="st-row"><span>Imprevistos 10%</span><span>${fUSD(t.imp)}</span></div>
+    <div class="st-row"><span>Beneficio 25%</span><span>${fUSD(t.ben)}</span></div>
+    <div class="st-row final"><span>TOTAL</span><span>${fUSD(t.fin)}</span></div>
+    <div class="st-row" style="font-size:11px;color:#888;margin-top:5px"><span>Ratio</span><span>${fRatio(t.ratio)}</span></div>`;
+  document.getElementById("badge-total").textContent=fUSD(t.fin)+` · ${fRatio(t.ratio)}`;
+}
+
+function renderResumen(where){
+  const t=calcTotals();
+  const sal=t.mo/(1+CS), cs_=t.mo-sal;
+  document.getElementById(where).innerHTML=`
+  <div class="resumen-card">
+    <div class="resumen-card-header">${where==="resumen-top"?"Resumen financiero — laudos mayo 2026":"Resumen financiero final"}</div>
+    <div class="resumen-grid">
+      <div class="metric"><div class="metric-label">Materiales</div><div class="metric-uyu">${fUYU(t.mat)}</div><div class="metric-usd">${fUSD(t.mat)}</div></div>
+      <div class="metric"><div class="metric-label">Mano de obra (c/CS 75,8%)</div><div class="metric-uyu">${fUYU(t.mo)}</div><div class="metric-usd">${fUSD(t.mo)}</div></div>
+      <div class="metric"><div class="metric-label">Imprevistos 10%</div><div class="metric-uyu">${fUYU(t.imp)}</div><div class="metric-usd">${fUSD(t.imp)}</div></div>
+      <div class="metric"><div class="metric-label">Beneficio empresa 25%</div><div class="metric-uyu">${fUYU(t.ben)}</div><div class="metric-usd">${fUSD(t.ben)}</div></div>
+    </div>
+    <div class="resumen-rows">
+      <div class="r-row section-row"><span>Materiales</span><div class="r-right"><div class="uyu">${fUYU(t.mat)}</div><div class="usd">${fUSD(t.mat)}</div></div></div>
+      <div class="r-row section-row"><span>Mano de obra</span><div class="r-right"><div class="uyu">${fUYU(t.mo)}</div><div class="usd">${fUSD(t.mo)}</div></div></div>
+      <div class="r-row indent"><span>— Salarios brutos (c/ropa)</span><div class="r-right"><div class="uyu">${fUYU(sal)}</div><div class="usd">${fUSD(sal)}</div></div></div>
+      <div class="r-row indent"><span>— Cargas sociales BPS+Caja (75,8%)</span><div class="r-right"><div class="uyu">${fUYU(cs_)}</div><div class="usd">${fUSD(cs_)}</div></div></div>
+      <div class="r-row highlight"><span>Subtotal neto</span><div class="r-right"><div class="uyu">${fUYU(t.neto)}</div><div class="usd">${fUSD(t.neto)}</div></div></div>
+      <div class="r-row"><span>+ Imprevistos (10%)</span><div class="r-right"><div class="uyu">${fUYU(t.imp)}</div><div class="usd">${fUSD(t.imp)}</div></div></div>
+      <div class="r-row"><span>+ Beneficio empresa (25%)</span><div class="r-right"><div class="uyu">${fUYU(t.ben)}</div><div class="usd">${fUSD(t.ben)}</div></div></div>
+      <div class="r-row"><span style="font-weight:600">Ratio USD/m² (187,90 m²)</span><div class="r-right"><div class="uyu" style="color:#1F3864;font-weight:600">${fRatio(t.ratio)}</div></div></div>
+      <div class="r-row final-row"><span>TOTAL FINAL</span><div class="r-right"><div class="uyu">${fUYU(t.fin)}</div><div class="usd">${fUSD(t.fin)}</div></div></div>
+    </div>
+  </div>`;
+}
+
+function renderRubros(){
+  const filterCap=document.getElementById("filter-cap").value;
+  const search=document.getElementById("search").value.toLowerCase();
+  const showUsd=document.getElementById("show-usd").checked;
+  const container=document.getElementById("rubros-container");
+  container.innerHTML="";
+  data.forEach((cap,ci)=>{
+    if(filterCap&&cap.cap!==filterCap)return;
+    const filt=cap.rubros.filter(r=>!search||r.d.toLowerCase().includes(search)||r.n.toLowerCase().includes(search));
+    if(!filt.length)return;
+    let capMat=0,capMo=0;
+    filt.forEach(r=>{const c=calcRow(r);capMat+=c.mat_tot;capMo+=c.mo_tot;});
+    const capTot=capMat+capMo;
+    const sec=document.createElement("div");
+    sec.className="section"; sec.id=cap.id;
+    sec.innerHTML=`
+    <div class="cap-header">
+      <h2>${cap.cap}</h2>
+      <div class="cap-total"><span>${fUYU(capTot)}</span>${showUsd?`<span>${fUSD(capTot)}</span>`:""}</div>
+    </div>
+    <table>
+      <thead><tr>
+        <th style="width:27%;text-align:left">Descripción</th>
+        <th style="width:5%">Unid.</th>
+        <th style="width:8%">Cantidad</th>
+        <th style="width:9%">Mat. UYU/u</th>
+        <th style="width:9%">MO UYU/u</th>
+        <th style="width:10%">Total UYU/u</th>
+        <th style="width:11%">Total UYU</th>
+        ${showUsd?`<th style="width:11%">Total USD</th>`:""}
+      </tr></thead>
+      <tbody id="tbody-${ci}"></tbody>
+    </table>`;
+    container.appendChild(sec);
+    const tbody=sec.querySelector("tbody");
+    filt.forEach(r=>{
+      const gi=cap.rubros.indexOf(r);
+      const{mo_u,mat_tot,mo_tot,tot}=calcRow(r);
+      const tr=document.createElement("tr");
+      tr.innerHTML=`
+        <td><div class="desc-main">${r.d}</div>${r.n?`<div class="desc-note">${r.n}</div>`:""}</td>
+        <td style="text-align:center;color:#666">${r.u}</td>
+        <td><input class="editable" data-ci="${ci}" data-gi="${gi}" data-f="c" value="${r.c}"/></td>
+        <td><input class="editable" data-ci="${ci}" data-gi="${gi}" data-f="mu" value="${r.mu}"/></td>
+        <td class="mo-cell">${fUYU(mo_u)}</td>
+        <td>${fUYU(mo_u+(r.mu||0))}</td>
+        <td style="font-weight:600">${fUYU(tot)}</td>
+        ${showUsd?`<td style="font-weight:600;color:#2E75B6">${fUSD(tot)}</td>`:""}`;
+      tbody.appendChild(tr);
+    });
+    const mmr=document.createElement("tr");
+    mmr.className="mat-mo-row";
+    mmr.innerHTML=`<td colspan="${showUsd?8:7}" style="text-align:right;padding:4px 8px">Mat: ${fUYU(capMat)} &nbsp;|&nbsp; MO c/CS: ${fUYU(capMo)}</td>`;
+    tbody.appendChild(mmr);
+    const sub=document.createElement("tr");
+    sub.className="subtotal-row";
+    sub.innerHTML=`<td colspan="6">Subtotal ${cap.cap}</td><td>${fUYU(capTot)}</td>${showUsd?`<td style="color:#2E75B6">${fUSD(capTot)}</td>`:""}`;
+    tbody.appendChild(sub);
+  });
+}
+
+function render(){renderNav();renderResumen("resumen-top");renderRubros();renderResumen("resumen-bottom");}
+function resetAll(){Object.assign(data,JSON.parse(JSON.stringify(originalData)));render();}
+
+const sel=document.getElementById("filter-cap");
+originalData.forEach(c=>{const o=document.createElement("option");o.value=c.cap;o.textContent=c.cap;sel.appendChild(o);});
+sel.addEventListener("change",render);
+document.getElementById("search").addEventListener("input",render);
+document.getElementById("show-usd").addEventListener("change",render);
+document.addEventListener("change",e=>{
+  if(!e.target.classList.contains("editable"))return;
+  const ci=+e.target.dataset.ci,gi=+e.target.dataset.gi,f=e.target.dataset.f;
+  const v=parseFloat(e.target.value)||0;
+  data[ci].rubros[gi][f]=v;
+  e.target.classList.add("changed");
+  render();
+});
+render();
+</script>
+</body>
+</html>
